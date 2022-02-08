@@ -1,0 +1,5 @@
+echo this or that
+dir
+touch file2.txt
+ls -l
+stop
