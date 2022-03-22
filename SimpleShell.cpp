@@ -17,6 +17,7 @@
 #include <unistd.h> // for POSIX
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 using namespace std;
 
@@ -56,12 +57,38 @@ void HiMomFunction()
         read(pip1[0], &getPassedString, 10);
         close(pip1[0]);
         
-        printf("From child process and pipe: %s\n", getPassedString);
+        printf("From child process: %s\n", getPassedString);
     }
 }
 
-int main()
+void signalHandler(int signum)
 {
+    string signalCaught = "";
+    string command = "";
+    string history = " >> ShellResults.txt";
+    
+    if(signum == SIGINT)
+    {
+        signalCaught = "Caught the SIGINT signal";
+        cout << signalCaught << endl;
+    }
+    else        
+    {
+        signalCaught = "Caught the signal number " + signum;
+        cout << signalCaught << endl;
+    }
+    command = "echo " + signalCaught + history;
+    system(command.c_str());
+
+    cout << "End of Shell. Shell History: " << endl;
+    string showFile = "cat ShellResults.txt";
+    system(showFile.c_str());  
+        
+    exit(signum);
+}
+
+int main()
+{    
 	// Delete old file history
 	ofstream shellOutput;
 	string oldFile = "ShellResults.txt";
@@ -73,6 +100,9 @@ int main()
 		shellOutput.close();
 	}
 
+    // Register signal handler through signal() function
+    signal(SIGINT, signalHandler);
+    
 	// Print a prompt
 	printf("This is the shell start. Enter a command. \n");
 
@@ -165,7 +195,7 @@ int main()
 		}
         else if(command == "hiMom")
         {
-            command = "echo hi Mom implementation" + history;
+            command = "echo hiMom command implementation" + history;
             system(command.c_str());
             HiMomFunction();
         }
@@ -174,7 +204,7 @@ int main()
 			string inputToFile = input + history;
 			system(inputToFile.c_str());
 		}
-
+        sleep(1);
 	}
 	fflush(stdin);
 
