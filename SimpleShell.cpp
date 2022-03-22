@@ -15,8 +15,50 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h> // for POSIX
+#include <sys/types.h>
+#include <sys/wait.h>
 
 using namespace std;
+
+void HiMomFunction()
+{
+    int pip1[2];        // file descriptor for pipe 
+    // pip1[0] is for reading
+    // pip1[1] is for writing 
+    if(pipe(pip1) == -1)
+    {
+        printf("Pipe failed to open \n");
+        exit(1);
+    }
+    
+    pid_t pID = fork(); // creating a new child process
+    
+    if(pID < 0)
+    {
+        perror("Failed to fork \n");
+        exit(1);
+    }
+    else if(pID == 0)
+        // child process
+    {
+        close(pip1[0]);     // child is not reading from pipe
+        char passedString[10] = "Hi mom!";
+        write(pip1[1], &passedString, 10);  // write to pipe
+        close(pip1[1]);     // close write side of pipe
+        exit(0);
+    }
+    else
+    {
+        waitpid(pID, nullptr, 0);
+        close(pip1[1]);     // parent is not writing to pipe
+        
+        char getPassedString[10];
+        read(pip1[0], &getPassedString, 10);
+        close(pip1[0]);
+        
+        printf("From child process and pipe: %s\n", getPassedString);
+    }
+}
 
 int main()
 {
@@ -121,6 +163,12 @@ int main()
 				system(command.c_str());
 			}
 		}
+        else if(command == "hiMom")
+        {
+            command = "echo hi Mom implementation" + history;
+            system(command.c_str());
+            HiMomFunction();
+        }
 		else
 		{
 			string inputToFile = input + history;
