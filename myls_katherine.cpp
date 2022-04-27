@@ -39,7 +39,38 @@ int main()
                 }
                 else if(command == "myls")
                 {
-                        printf("Hi. Going to parse arg.");
+                        printf("Going to parse argume>
+
+                        // declare pointer to directo>
+                        string dirName;
+
+                        // no directory name given
+                        if(param.empty())
+                        {
+                                // use current direct>
+                                // continue onto files
+
+                                DIR *dirPTR;
+                                struct dirent *dirP;
+                                dirPTR = opendir(".");
+                                if (dirPTR)
+                                {
+                                        while((dirP = readdir(dirPTR)) != NULL)
+                                        {
+                                                cout << dirP->d_name << endl;
+                                        }
+                                        // close directory
+                                        closedir(dirPTR);
+                                }
+                        }
+                        else
+                        {
+                                // check that dirName exists
+                                // state that it is directory
+//                              DIR *opendir(dirName);
+                                cout << "Directory Name was given." << endl;
+                        }
+                        // list all files
                 }
                 else
                 {
