@@ -39,9 +39,9 @@ int main()
                 }
                 else if(command == "myls")
                 {
-                        printf("Going to parse argume>
+                        printf("Going to parse arguments and output commands \n");
 
-                        // declare pointer to directo>
+                        // declare pointer to directory name
                         string dirName;
 
                         // no directory name given
