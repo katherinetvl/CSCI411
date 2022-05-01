@@ -9,29 +9,33 @@
 #include <dirent.h>
 #include <time.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <sys/types.h>
+#include <stdlib.h>
+#include <string.h>
 
 // C++ declarations
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
 #include <string>
+
 using namespace std;
 
 int main()
 {
         // Print a prompt
-        printf("Type myls to mimic the ls command. Ty>
+        printf("Type myls to mimic the ls command. Type quit to exit. \n");
 
         while(1)
         {
                 stringstream ssObject;
                 string input;
-                string command, arg1, arg2, arg3;
+                string command, param;
                 getline(cin, input);
 
                 ssObject << input;
-                ssObject >> command >> arg1 >> arg2 >>
+                ssObject >> command >> param;
 
                 if(command == "quit")
                 {
@@ -39,46 +43,61 @@ int main()
                 }
                 else if(command == "myls")
                 {
-                        printf("Going to parse arguments and output commands \n");
+                        // printf("Going to parse arguments and output commands \n");
 
                         // declare pointer to directory name
-                        string dirName;
+                        char *dirName;
+                        // string cdDir = "cd ";
 
-                        // no directory name given
-                        if(param.empty())
+                        // if parameter given, check if directory and open
+                        if(!param.empty())
                         {
-                                // use current direct>
-                                // continue onto files
-
-                                DIR *dirPTR;
-                                struct dirent *dirP;
-                                dirPTR = opendir(".");
-                                if (dirPTR)
+                                char *paramPtr = const_cast<char*>(param.c_str());
+                                dirName = paramPtr;
+                                DIR *potentialDir = opendir(dirName);
+                                if(potentialDir)
                                 {
-                                        while((dirP = readdir(dirPTR)) != NULL)
-                                        {
-                                                cout << dirP->d_name << endl;
-                                        }
-                                        // close directory
-                                        closedir(dirPTR);
+                                        // cdDir = cdDir + param;
+                                        // cout << "cdDir is: " + cdDir << endl;
+                                        chdir(param.c_str());   // open the directory
                                 }
                         }
-                        else
+
+                        // show current directory used
+                        printf("Current working directory: %s\n", get_current_dir_name());
+
+                        // list all files:
+                        // 1. declare directory pointer
+                        DIR *dirPTR;
+                        struct dirent *dirP;
+                        dirPTR = opendir(".");  // open directory
+                        if (dirPTR)
                         {
-                                // check that dirName exists
-                                // state that it is directory
-//                              DIR *opendir(dirName);
-                                cout << "Directory Name was given." << endl;
+                                while((dirP = readdir(dirPTR)) != NULL)
+                                {
+                                        // permissions
+
+                                        // name of directory
+                                        cout << dirP->d_name << " ";
+
+                                        // date last modified
+
+                                        cout << endl;
+                                }
+
+                                // close directory
+                                closedir(dirPTR);
+                                break;
                         }
-                        // list all files
                 }
                 else
                 {
                         break;
                 }
-        }
+        }       // end while loop
 
         fflush(stdin);
 
     return 0;
 }
+
